@@ -12,13 +12,32 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+use App\Models\User;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get(
+    '/',
+    function () {
+        return view('welcome');
+    }
+);
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+Route::get(
+    '/dashboard',
+    function () {
+        return view('dashboard');
+    }
+)->middleware(['auth'])->name('dashboard');
+
+Route::middleware(['auth'])
+    ->prefix('transactions')  // Matches The "/transaction/*" URL
+    ->group(
+        function () {
+            Route::get('/', '\App\Http\Controllers\TransactionsController@list');
+            Route::delete('/{transaction}', 'App\Http\Controllers\TransactionsController@delete');
+            Route::post('/', 'App\Http\Controllers\TransactionsController@create');
+            Route::post('/import', 'App\Http\Controllers\TransactionsController@import');
+            Route::put('/{transaction}', 'App\Http\Controllers\TransactionsController@update');
+        }
+    );
 
 require __DIR__.'/auth.php';
